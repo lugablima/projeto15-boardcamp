@@ -7,7 +7,7 @@ import connection from "../dbStrategy/postgres.js";
 //   return categoriesIds.map((el) => el.id);
 // }
 
-// Falta adicionar o regex para verificar a extensão da imagem
+const regexImageExtension = /\.(jpg|png|jpeg|svg)$/;
 
 const { rows: categoriesIds } = await connection.query("SELECT id FROM categories");
 
@@ -15,7 +15,7 @@ const listValidCategories = categoriesIds.map((el) => el.id);
 
 const gameSchema = joi.object({
   name: joi.string().trim().required(),
-  image: joi.string().uri().required(),
+  image: joi.string().uri().pattern(regexImageExtension).required(),
   stockTotal: joi.number().integer().positive().required(),
   categoryId: joi
     .number()
