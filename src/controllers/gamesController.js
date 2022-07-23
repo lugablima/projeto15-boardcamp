@@ -7,19 +7,24 @@ export async function getGames(req, res) {
 
   try {
     if (!name) {
-      const { rows } = await connection.query("SELECT * FROM games");
+      const { rows } = await connection.query(`
+      SELECT games.*, categories.name as "categoryName" FROM games
+      JOIN categories
+      ON games."categoryId" = categories.id`);
 
       games = rows;
     } else {
-      const nameQuery = `${name}%`;
-
-      const { rows } = await connection.query("SELECT * FROM games WHERE name LIKE $1", [nameQuery]);
-      // Falta fazer a pesquisa ser case insensitive
+      const { rows } = await connection.query(
+        `
+      SELECT games.*, categories.name as "categoryName" FROM games
+      JOIN categories
+      ON games."categoryId" = categories.id 
+      WHERE games.name ILIKE $1`,
+        [`${name}%`]
+      );
 
       games = rows;
     }
-
-    // Falta colocar o categoryName;
 
     res.send(games);
   } catch (err) {
