@@ -6,17 +6,24 @@ export async function getCustomers(req, res) {
     let customers;
 
     if (!cpf) {
-      const { rows } = await connection.query(`SELECT * FROM customers`);
+      const { rows } = await connection.query(`
+      SELECT id, name, phone, cpf, to_char(birthday, 'YYYY-MM-DD') as birthday 
+      FROM customers`);
       customers = rows;
     } else {
       const { rows } = await connection.query(
-        `SELECT * FROM customers
+        `SELECT id, name, phone, cpf, to_char(birthday, 'YYYY-MM-DD') as birthday 
+         FROM customers
          WHERE cpf LIKE $1`,
         [`${cpf}%`]
       );
 
       customers = rows;
     }
+
+    // SELECT to_char(birthday, 'YYYY-MM-DD') as birthday FROM customers;
+
+    // Falta descobrir pq ele está retornando o horário no birthday
 
     res.send(customers);
   } catch (err) {
@@ -29,7 +36,8 @@ export async function getCustomerById(req, res) {
   const { id } = req.params;
   try {
     const { rows: customer } = await connection.query(
-      `SELECT * FROM customers
+      `SELECT id, name, phone, cpf, to_char(birthday, 'YYYY-MM-DD') as birthday  
+       FROM customers
        WHERE id = $1`,
       [id]
     );
@@ -39,6 +47,27 @@ export async function getCustomerById(req, res) {
     res.send(customer[0]);
   } catch (err) {
     console.log("Error while getting customer by id", err.message);
+    res.sendStatus(500);
+  }
+}
+
+export async function createCustomer(req, res) {
+  const {
+    customer: { name, phone, cpf, birthday },
+  } = res.locals;
+
+  try {
+    await connection.query(
+      `
+    INSERT INTO customers 
+    (name, phone, cpf, birthday) 
+    VALUES ($1, $2, $3, $4)`,
+      [name, phone, cpf, birthday]
+    );
+
+    res.sendStatus(201);
+  } catch (err) {
+    console.log("Error while creating a new customer", err.message);
     res.sendStatus(500);
   }
 }
