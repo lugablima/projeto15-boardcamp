@@ -3,6 +3,7 @@ import customerSchema from "../schemas/customersSchema.js";
 
 async function validateCustomer(req, res, next) {
   const customer = req.body;
+  const { id } = req.params;
 
   const { error } = customerSchema.validate(customer, { abortEarly: false });
 
@@ -11,20 +12,27 @@ async function validateCustomer(req, res, next) {
   }
 
   try {
-    const { rows: customerAlreadyExist } = await connection.query(
-      `
-    SELECT * FROM customers
-    WHERE cpf = $1`,
-      [customer.cpf]
-    );
+    let customerAlreadyExist;
+
+    if (req.method === "PUT") {
+      const { rows } = await connection.query(
+        `SELECT * FROM customers
+        WHERE cpf = $1 AND id <> $2`,
+        [customer.cpf, id]
+      );
+
+      customerAlreadyExist = rows;
+    } else {
+      const { rows } = await connection.query(
+        `SELECT * FROM customers
+        WHERE cpf = $1`,
+        [customer.cpf]
+      );
+
+      customerAlreadyExist = rows;
+    }
 
     if (customerAlreadyExist[0]) return res.status(409).send("Esse cliente já existe!");
-
-    console.log("antes", customer.birthday);
-
-    customer.birthday = customer.birthday.slice(0, 10);
-
-    console.log("depois", customer.birthday);
 
     // Falta fazer a sanitização dos dados e o trim()
 
