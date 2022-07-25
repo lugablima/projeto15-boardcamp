@@ -7,27 +7,25 @@ export async function getCustomers(req, res) {
 
     if (!cpf) {
       const { rows } = await connection.query(`
-      SELECT id, name, phone, cpf, to_char(birthday, 'YYYY-MM-DD') as birthday 
-      FROM customers`);
+      SELECT *, to_char(birthday, 'YYYY-MM-DD') as birthday 
+      FROM customers
+      ORDER BY id ASC`);
       customers = rows;
     } else {
       const { rows } = await connection.query(
-        `SELECT id, name, phone, cpf, to_char(birthday, 'YYYY-MM-DD') as birthday 
+        `SELECT *, to_char(birthday, 'YYYY-MM-DD') as birthday 
          FROM customers
-         WHERE cpf LIKE $1`,
+         WHERE cpf LIKE $1
+         ORDER BY id ASC`,
         [`${cpf}%`]
       );
 
       customers = rows;
     }
 
-    // SELECT to_char(birthday, 'YYYY-MM-DD') as birthday FROM customers;
-
-    // Falta descobrir pq ele está retornando o horário no birthday
-
     res.send(customers);
   } catch (err) {
-    console.log("Error while getting customers", err.message);
+    console.log("Error getting customers", err.message);
     res.sendStatus(500);
   }
 }
@@ -36,7 +34,7 @@ export async function getCustomerById(req, res) {
   const { id } = req.params;
   try {
     const { rows: customer } = await connection.query(
-      `SELECT id, name, phone, cpf, to_char(birthday, 'YYYY-MM-DD') as birthday  
+      `SELECT *, to_char(birthday, 'YYYY-MM-DD') as birthday  
        FROM customers
        WHERE id = $1`,
       [id]
@@ -46,7 +44,7 @@ export async function getCustomerById(req, res) {
 
     res.send(customer[0]);
   } catch (err) {
-    console.log("Error while getting customer by id", err.message);
+    console.log("Error getting customer by id", err.message);
     res.sendStatus(500);
   }
 }
@@ -67,7 +65,7 @@ export async function createCustomer(req, res) {
 
     res.sendStatus(201);
   } catch (err) {
-    console.log("Error while creating a new customer", err.message);
+    console.log("Error creating a new customer", err.message);
     res.sendStatus(500);
   }
 }
@@ -88,7 +86,7 @@ export async function updateCustomer(req, res) {
 
     res.sendStatus(200);
   } catch (err) {
-    console.log("Error while updating customer", err.message);
+    console.log("Error updating a customer", err.message);
     res.sendStatus(500);
   }
 }

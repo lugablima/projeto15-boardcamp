@@ -3,7 +3,6 @@ import joiDate from "@joi/date";
 
 const joi = Joi.extend(joiDate);
 
-// Falta colocar o grex do nome
 const regexCPF = /^[0-9]{11}$/;
 const regexPhone = /^[0-9]{10,11}$/;
 

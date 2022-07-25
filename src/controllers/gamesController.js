@@ -10,7 +10,8 @@ export async function getGames(req, res) {
       const { rows } = await connection.query(`
       SELECT games.*, categories.name as "categoryName" FROM games
       JOIN categories
-      ON games."categoryId" = categories.id`);
+      ON games."categoryId" = categories.id
+      ORDER BY games.id ASC`);
 
       games = rows;
     } else {
@@ -19,7 +20,8 @@ export async function getGames(req, res) {
       SELECT games.*, categories.name as "categoryName" FROM games
       JOIN categories
       ON games."categoryId" = categories.id 
-      WHERE games.name ILIKE $1`,
+      WHERE games.name ILIKE $1
+      ORDER BY games.id ASC`,
         [`${name}%`]
       );
 
@@ -28,7 +30,7 @@ export async function getGames(req, res) {
 
     res.send(games);
   } catch (err) {
-    console.log("Error while getting games", err.message);
+    console.log("Error getting games", err.message);
     res.sendStatus(500);
   }
 }
@@ -47,7 +49,7 @@ export async function createGame(req, res) {
 
     res.sendStatus(201);
   } catch (err) {
-    console.log("Error while creating a new game", err.message);
+    console.log("Error creating a new game", err.message);
     res.sendStatus(500);
   }
 }

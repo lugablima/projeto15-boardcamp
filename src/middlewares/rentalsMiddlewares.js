@@ -31,7 +31,7 @@ async function validateRental(req, res, next) {
 
     next();
   } catch (err) {
-    console.log("Error while validating a new rental", err.message);
+    console.log("Error validating a new rental", err.message);
     res.sendStatus(500);
   }
 }

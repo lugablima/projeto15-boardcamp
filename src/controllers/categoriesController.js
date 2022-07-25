@@ -2,11 +2,11 @@ import connection from "../dbStrategy/postgres.js";
 
 export async function getCategories(req, res) {
   try {
-    const { rows: categories } = await connection.query("SELECT * FROM categories");
+    const { rows: categories } = await connection.query("SELECT * FROM categories ORDER BY id ASC");
 
     res.send(categories);
   } catch (err) {
-    console.log("Error while getting categories", err.message);
+    console.log("Error getting categories", err.message);
     return res.sendStatus(500);
   }
 }
@@ -19,7 +19,7 @@ export async function createCategory(req, res) {
 
     res.sendStatus(201);
   } catch (err) {
-    console.log("Error while creating a new category", err.message);
+    console.log("Error creating a new category", err.message);
     return res.sendStatus(500);
   }
 }

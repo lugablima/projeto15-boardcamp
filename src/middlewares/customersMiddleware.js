@@ -1,3 +1,4 @@
+import { stripHtml } from "string-strip-html";
 import connection from "../dbStrategy/postgres.js";
 import customerSchema from "../schemas/customersSchema.js";
 
@@ -10,6 +11,8 @@ async function validateCustomer(req, res, next) {
   if (error) {
     return res.status(400).send(error.details.map((err) => ({ message: err.message })));
   }
+
+  customer.name = stripHtml(customer.name).result.trim();
 
   try {
     let customerAlreadyExist;
@@ -34,13 +37,11 @@ async function validateCustomer(req, res, next) {
 
     if (customerAlreadyExist[0]) return res.status(409).send("Esse cliente já existe!");
 
-    // Falta fazer a sanitização dos dados e o trim()
-
     res.locals.customer = customer;
 
     next();
   } catch (err) {
-    console.log("Error while validating customer", err.message);
+    console.log("Error validating customer", err.message);
     res.sendStatus(500);
   }
 }

@@ -1,4 +1,3 @@
-/* eslint-disable radix */
 import dayjs from "dayjs";
 import connection from "../dbStrategy/postgres.js";
 
@@ -99,7 +98,7 @@ export async function getRentals(req, res) {
 
     res.send(rentals);
   } catch (err) {
-    console.log("Error while getting rentals", err.message);
+    console.log("Error getting rentals", err.message);
     res.sendStatus(500);
   }
 }
@@ -123,7 +122,7 @@ export async function createRental(req, res) {
 
     res.sendStatus(201);
   } catch (err) {
-    console.log("Error while creating a new rental", err.message);
+    console.log("Error creating a new rental", err.message);
     res.sendStatus(500);
   }
 }
@@ -192,7 +191,7 @@ export async function deleteRental(req, res) {
 
     res.sendStatus(200);
   } catch (err) {
-    console.log("Error while deleting a rental", err.message);
+    console.log("Error deleting a rental", err.message);
     res.sendStatus(500);
   }
 }

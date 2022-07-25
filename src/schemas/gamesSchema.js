@@ -1,17 +1,15 @@
 import joi from "joi";
 import connection from "../dbStrategy/postgres.js";
 
-// async function renderListValidCategories() {
-//   const { rows: categoriesIds } = await connection.query("SELECT id FROM categories");
+async function renderListValidCategories() {
+  const { rows: categoriesIds } = await connection.query("SELECT id FROM categories ORDER BY id ASC");
 
-//   return categoriesIds.map((el) => el.id);
-// }
+  return categoriesIds.map((el) => el.id);
+}
 
 const regexImageExtension = /\.(jpg|png|jpeg|svg)$/;
 
-const { rows: categoriesIds } = await connection.query("SELECT id FROM categories");
-
-const listValidCategories = categoriesIds.map((el) => el.id);
+const listValidCategories = await renderListValidCategories();
 
 const gameSchema = joi.object({
   name: joi.string().trim().required(),
@@ -26,3 +24,7 @@ const gameSchema = joi.object({
 });
 
 export default gameSchema;
+
+// const { rows: categoriesIds } = await connection.query("SELECT id FROM categories");
+
+// const listValidCategories = categoriesIds.map((el) => el.id);

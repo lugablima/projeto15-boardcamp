@@ -1,3 +1,4 @@
+import { stripHtml } from "string-strip-html";
 import categorySchema from "../schemas/categoriesSchema.js";
 import connection from "../dbStrategy/postgres.js";
 
@@ -6,14 +7,14 @@ async function validateCategory(req, res, next) {
 
   const { error } = categorySchema.validate(category);
 
-  if (error && error.details[0].type === "string.empty") {
-    return res.status(400).send("A propriedade 'name' não pode estar vazia!");
+  if (error) {
+    return res.status(400).send(error.details.map((err) => ({ message: err.message })));
   }
 
-  if (error) return res.sendStatus(422);
+  category.name = stripHtml(category.name).result.trim();
 
   try {
-    const { rows: categoryAlreadyExist } = await connection.query("SELECT * FROM categories WHERE name = $1", [category.name]);
+    const { rows: categoryAlreadyExist } = await connection.query("SELECT * FROM categories WHERE name ILIKE $1", [`${category.name}`]);
 
     if (categoryAlreadyExist.length) return res.status(409).send("Essa categoria já existe!");
 
@@ -21,7 +22,7 @@ async function validateCategory(req, res, next) {
 
     next();
   } catch (err) {
-    console.log("Error while validating a category", err.message);
+    console.log("Error validating a category", err.message);
     return res.sendStatus(500);
   }
 }
