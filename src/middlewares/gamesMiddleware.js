@@ -15,6 +15,12 @@ async function validateGame(req, res, next) {
   game.image = game.image.trim();
 
   try {
+    const {
+      rows: [category],
+    } = await connection.query("SELECT FROM categories WHERE id = $1", [game.categoryId]);
+
+    if (!category) return res.sendStatus(400);
+
     const { rows } = await connection.query("SELECT * FROM games WHERE name ILIKE $1", [`${game.name}`]);
     const gameAlreadyExist = rows[0];
 

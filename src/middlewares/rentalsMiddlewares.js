@@ -11,6 +11,15 @@ async function validateRental(req, res, next) {
   }
 
   try {
+    const {
+      rows: [customer],
+    } = await connection.query("SELECT * FROM customers WHERE id = $1", [rental.customerId]);
+    const {
+      rows: [game],
+    } = await connection.query("SELECT * FROM games WHERE id = $1", [rental.gameId]);
+
+    if (!customer || !game) return res.sendStatus(400);
+
     const { rows: openRentals } = await connection.query(
       `SELECT * FROM rentals
     WHERE "gameId" = $1 AND "returnDate" IS NULL`,
